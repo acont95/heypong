@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Boom Chat</title>
+		<link rel="stylesheet" href="{{url_for('static', path='/style.css')}}">
+	</head>
+
+	<body id="body">
+
+		<header>
+			<img id="logo" src="{{url_for('static', path='/logo2.svg')}}">
+		</header>
+
+		<div id="mainContainer">
+			<div id="contentContainer">
+				<div id=videoWrapper>
+					<div class = "videoContainer" id="remoteVideoContainer">
+						<video autoplay="true" class = "video" id="remoteVideo">
+				
+						</video>
+					</div>
+					<div class = "videoContainer" id="localVideoContainer">
+						<video autoplay="true" class = video id="localVideo">
+						
+						</video>
+					</div>
+				</div>
+			</div>
+		
+			<div id="chatContainer">
+				<ul id=chatBox>
+
+				</ul>
+
+				<div id="bottomRow">
+					<button type="button" id="sendMessageButton" class="hvr-fade">Send<br>Message</button>
+					<img id="arrow" src="{{url_for('static', path='/line-angle-right.svg')}}">
+					<textarea id = textInput name=textInput cols="40" rows="5"></textarea>	
+					
+					<button id="nextButton" class="hvr-fade">Next</button>
+					
+					<label for="autoNext" id="checkboxLabel">Enable Auto-Next:</label>
+					<input type="checkbox" id="autoNext" name="autoNext">
+				</div>
+			</div>
+		</div>
+
+
+		<script src="{{url_for('static', path='/signaling.js')}}"></script>
+	</body>
+</html>

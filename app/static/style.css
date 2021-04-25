@@ -1,0 +1,293 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    /* border: 2px solid orange; */
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    /* border: 2px solid green; */
+    /* margin: 2px; */
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#logo {
+    width: 30vh;  
+    height: auto;
+    margin-left: 6px;
+    margin-top: 6px;
+}
+
+#mainContainer {
+    /* border: 2px solid rgb(44, 73, 204); */
+    margin: 4px;
+
+    /* height: 100%; */
+    min-height: 0;
+    display: flex;
+}
+
+#contentContainer {
+    /* margin: 2px; */
+    /* border: 2px solid yellow; */
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+}
+
+#videoWrapper {
+    /* border: 2px solid purple; */
+    /* margin: 2px; */
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 0;
+}
+
+.videoContainer {
+    border: 1px solid #000000; 
+    margin: 2px;
+    height: 45vh;
+    width: 60vh;
+    min-height: 0;
+    border-radius: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video {
+    /* background-color: #666; */
+    background-color: whitesmoke;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    border-radius: 15px;
+}
+
+#chatContainer {
+    /* border: 2px solid rgb(199, 47, 47); */
+    /* margin: 2px; */
+    flex: 1 1 auto;
+    min-width: 0; /*https://stackoverflow.com/questions/41674979/flex-child-is-growing-out-of-parent*/
+    display: flex;
+    flex-direction: column;
+}
+
+#bottomRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: 0 1 auto;
+}
+
+#chatBox {
+    margin: 2px;
+    border: 1px solid black;
+    border-radius: 15px;
+    flex: 1 1 auto;
+    list-style-type: none;
+    padding: 5px;
+    
+    /* allow list to scroll */
+    height: 0; /*https://stackoverflow.com/questions/31292954/how-can-i-get-overflowscroll-inside-a-flex-box */
+    overflow: auto;
+}
+
+.sentMessage {
+    width: fit-content;
+    color: white;
+    padding: 10px;
+    background-color: darkcyan;
+    border-radius: 20px;
+    margin: 2px;
+
+    overflow-wrap: break-word;
+    max-width: 50%;
+
+    float: left; /*https://stackoverflow.com/questions/33322281/aligning-message-bubbles-right-and-left*/
+    clear: both;
+}
+
+.recievedMessage {
+    width: fit-content;
+    color: white;
+    padding: 10px;
+    background-color: orange;
+    border-radius: 20px;
+    margin: 2px;
+
+    overflow-wrap: break-word;
+    max-width: 50%;
+
+    float: right;
+    clear: both;
+}
+
+#inputBox {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#arrow {
+    flex: 0 1 auto;
+    height: 3vh;
+    margin: 5px;
+}
+
+#textInput {
+    flex: 1 1 auto;
+    resize: none;
+}
+
+#sendMessageButton {
+    border: none;
+    font-size: 16px;
+    border-radius: 12px;
+    flex: 0 1 auto;
+    margin: 5px;
+    padding: 5px;
+}
+
+#nextButton {
+    border: none;
+    font-size: 16px;
+    margin: 5px;
+    padding: 25px;
+    text-align: center;
+    border-radius: 12px;
+    flex: 0 1 auto;
+}
+
+.hvr-fade {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    overflow: hidden;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: color, background-color;
+    transition-property: color, background-color;
+    background-color: lightgray;
+  }
+.hvr-fade:hover {
+    background-color: turquoise;
+    color: white;
+}
+
+.hvr-fade:active {
+    background-color: limegreen;
+    color: white;
+    -webkit-transition: background-color 0s;
+    transition: background-color 0s
+} 
+
+#checkboxLabel {
+    margin: 5px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 16px;
+    pointer-events: none;
+    cursor: default;
+}
+
+input[type='checkbox']{
+    cursor: pointer;
+    width: 30px !important;
+    height: 30px !important;
+    margin: 5px;
+    margin-right: 10px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance:none;
+    outline: 4px solid lightgray;
+    box-shadow: none;
+}
+
+input[type='checkbox']:hover {
+    outline: 4px solid turquoise;
+}
+
+input[type='checkbox']:checked {
+    background-color: limegreen;
+}
+
+  
+@-moz-keyframes spinner-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spinner-loader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+/* :not(:required) hides this rule from IE9 and below */
+.spinner-loader:not(:required) {
+  -moz-animation: spinner-loader 1500ms infinite linear;
+  -webkit-animation: spinner-loader 1500ms infinite linear;
+  animation: spinner-loader 1500ms infinite linear;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  -moz-box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  -webkit-box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  display: inline-block;
+  font-size: 10px;
+  width: 1em;
+  height: 1em;
+  margin: 1.5em;
+  overflow: hidden;
+  text-indent: 100%;
+}
