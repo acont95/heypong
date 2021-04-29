@@ -1,6 +1,6 @@
 "use strict";
 // Establish a websocket connection to server.
-var ws = new WebSocket("ws://127.0.0.1:8000/ws");
+var ws = new WebSocket("wss://" + location.host + "/ws");
 
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
@@ -10,9 +10,6 @@ const loader = document.getElementById('loaderWrap');
 let localStream = null;
 
 nextButton.textContent = "Next";
-
-// nextButton.disabled = true;
-// nextButton.addEventListener('click', nextVideoChat);
 
 //Client identifier to be returned by signaling server.
 let clientId = null;
@@ -210,16 +207,12 @@ function newPeerConnection(peerTarget) {
             case "failed":
             case "closed":
             case "disconnected":
-                // closeVideoCall(); 
-                // nextButton.click();
-                // nextButton.textContent = "Next";
                 handleDisconnect();
                 break;
             
             case "completed":
             case "connected":
                 disableLoaderAnimation();
-                // nextButton.textContent = "Stop";
                 break;
         }
     }
@@ -235,15 +228,12 @@ function initiate_offer(peerTarget) {
 };
 
 async function nextVideoChat() {
-    // closeVideoCall();
-    // clearChat();
     var peerTarget = await getPeerId();
     if (peerTarget){
         newPeerConnection(peerTarget);
         initiate_offer(peerTarget);
     }
     else {
-        // nextButton.disabled = true;
     }
 };
 
@@ -265,10 +255,17 @@ function startTimer(duration, display) {
 }
 
 function showTimer() {
-    const item = document.createElement('li');
-    item.textContent = "New chat in: 05";
-    messageList.appendChild(item);
+    // const item = document.createElement('li');
+    // item.textContent = "New chat in: 05";
+    // messageList.appendChild(item);
+    const item = appendTimer();
     startTimer(4, item);
+}
+
+function removeTimer() {
+    var listItems = messageList.getElementsByTagName('li');
+    var last = listItems[listItems.length - 1];
+    messageList.removeChild(last);
 }
 
 function handleNextButtonClick() {
@@ -283,31 +280,26 @@ function handleNextButtonClick() {
         nextButton.textContent = "Stop";
 
         sendDisconnect();
-        // enableLoaderAnimation();
         closeVideoCall();
-        clearChat();
+        // clearChat();
 
         showTimer();
 
         setTimeout(function() {
-            enableLoaderAnimation();
-            clearChat();
-            nextVideoChat();
+            if (nextButton.textContent === "Stop") {
+                enableLoaderAnimation();
+                clearChat();
+                nextVideoChat();
+            }
         }, 5000)
-        // nextVideoChat();
     }
     else if (!connectionMap.size) {
-        // nextButton.textContent = "Stop";
-
-        // enableLoaderAnimation();
-        // closeVideoCall();
-        // clearChat();
-        // nextVideoChat();
         if (nextButton.textContent === "Stop") {
             nextButton.textContent = "Next";
             disableLoaderAnimation();
             closeVideoCall();
-            clearChat();
+            removeTimer();
+            // clearChat();
         } else {
             nextButton.textContent = "Stop";
             enableLoaderAnimation();
@@ -319,13 +311,21 @@ function handleNextButtonClick() {
 }
 
 function handleDisconnect() {
-    nextButton.textContent = "Next";
     if (autoNext.checked) {
+        nextButton.textContent = "Stop";
         closeVideoCall();
-        clearChat();
-        nextVideoChat();
+        showTimer();
+
+        setTimeout(function() {
+            if (nextButton.textContent === "Stop") {
+                enableLoaderAnimation();
+                clearChat();
+                nextVideoChat();
+            }
+        }, 5000)
     }
     else {
+        nextButton.textContent = "Next";
         closeVideoCall();
     }
 }
@@ -360,8 +360,6 @@ function closeVideoCall() {
 }
 
 //Next Button
-// nextButton.disabled = true;
-// nextButton.addEventListener('click', nextVideoChat);
 nextButton.addEventListener('click', handleNextButtonClick);
 
 // Chat 
@@ -381,8 +379,6 @@ function sendMessage(event) {
         appendSentMessage(msg);
         textInput.value = "";
     } 
-    // appendSentMessage(msg);
-    // textInput.value = "";
 };
 
 function enterKeyMessage(event) {
@@ -411,6 +407,15 @@ function appendRecievedMessage(msg) {
         messageList.appendChild(item);
         scrollChatBottom();
     }
+}
+
+function appendTimer() {
+    const item = document.createElement('li');
+    item.className = "timer"
+    item.textContent = "New chat in: 05";
+    messageList.appendChild(item);
+    scrollChatBottom();
+    return item;
 }
 
 function scrollChatBottom() {
