@@ -7,9 +7,16 @@ const remoteVideo = document.getElementById('remoteVideo');
 const nextButton = document.getElementById('nextButton');
 const autoNext = document.getElementById('autoNext');
 const loader = document.getElementById('loaderWrap');
+const numUsers = document.getElementById('numUsers');
+const messageList = document.getElementById("chatBox");
+const textInput = document.getElementById("textInput");
+const sendMessageButton = document.getElementById("sendMessageButton");
+
 let localStream = null;
 
 nextButton.textContent = "Next";
+sendMessageButton.disabled = true;
+textInput.disabled = true;
 
 //Client identifier to be returned by signaling server.
 let clientId = null;
@@ -18,11 +25,9 @@ const connectionState = false;
 
 let connectionMap = new Map();
 
-// Get user video/audio and set to localVideo element.
-const mediaStreamConstraints = {
-    audio: false,
-    video: true
-};
+sendMessageButton.addEventListener("click", sendMessage);
+textInput.addEventListener("keydown", enterKeyMessage);
+nextButton.addEventListener('click', handleNextButtonClick);
 
 // Add STUN/TURN servers.
 const configuration = {
@@ -33,19 +38,38 @@ const configuration = {
     ]
 };
 
-async function getUserMedia(constraints) {
+function getUserMedia() {
     let stream = null;
   
     try {
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
-      localVideo.srcObject = stream;
-      localStream = stream;
-      nextButton.disabled = false;
-      /* use the stream */
+        navigator.mediaDevices.enumerateDevices().then(
+            async function(devices) {
+                const mics = devices.filter(device => device.kind =='audioinput');
+                const mediaStreamConstraints = {
+                    audio: mics.length > 0,
+                    video: true
+                };
+                stream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints);
+                localVideo.srcObject = stream;
+                localStream = stream;
+                nextButton.disabled = false;
+            }
+        )
+
     } catch(err) {
-      /* handle the error */
+        /* handle the error */
+        showEnableCameraMessage();
+        nextButton.disabled=true;
     }
-}
+};
+
+function showEnableCameraMessage() {
+    const item = document.createElement('li');
+    item.className = "showCamera"
+    item.textContent = "Camera must be enable to use heypong. Please refresh page and enable your camera.";
+    messageList.appendChild(item);
+    scrollChatBottom();
+};
 
 function sendOffer(peerConnection, peerTarget) {
     ws.send(
@@ -58,7 +82,7 @@ function sendOffer(peerConnection, peerTarget) {
             }
         )
     );    
-}
+};
 
 function sendAnswer(peerConnection, peerTarget) {
     ws.send(
@@ -71,7 +95,7 @@ function sendAnswer(peerConnection, peerTarget) {
             }
         )
     );
-}
+};
 
 function handleOffer(offer) {
     const peerTarget = offer['caller'];
@@ -135,7 +159,8 @@ ws.onmessage = function(event) {
     } 
     else if (data['type'] === "client-identifier") {
         clientId = data['id'];
-        getUserMedia(mediaStreamConstraints);
+        getUserMedia();
+        setNumUsers();
     }
     else if (data['type'] === "chat") {
         const msg = data['message'];
@@ -154,6 +179,20 @@ async function getPeerId() {
         return response['peer'];
     }
 };
+
+async function getNumUsers() {
+    const url = `/num_users`;
+    var result = await fetch(url);
+    if (result.ok) {
+        const response = await result.json();
+        return response['num_users'];
+    }
+};
+
+async function setNumUsers() {
+    const n = await getNumUsers();
+    numUsers.textContent = `Number of users online: ${n}`
+}
 
 function newPeerConnection(peerTarget) {
     const peerConnection = new RTCPeerConnection(configuration);
@@ -212,6 +251,8 @@ function newPeerConnection(peerTarget) {
             
             case "completed":
             case "connected":
+                textInput.disabled = false;
+                sendMessageButton.disabled = false;
                 disableLoaderAnimation();
                 break;
         }
@@ -255,9 +296,6 @@ function startTimer(duration, display) {
 }
 
 function showTimer() {
-    // const item = document.createElement('li');
-    // item.textContent = "New chat in: 05";
-    // messageList.appendChild(item);
     const item = appendTimer();
     startTimer(4, item);
 }
@@ -269,7 +307,8 @@ function removeTimer() {
 }
 
 function handleNextButtonClick() {
-    // nextButton.textContent = "Next";
+    sendMessageButton.disabled = true;
+    textInput.disabled = true;
     if (connectionMap.size && !autoNext.checked) {
         nextButton.textContent = "Next";
 
@@ -281,10 +320,7 @@ function handleNextButtonClick() {
 
         sendDisconnect();
         closeVideoCall();
-        // clearChat();
-
         showTimer();
-
         setTimeout(function() {
             if (nextButton.textContent === "Stop") {
                 enableLoaderAnimation();
@@ -298,8 +334,7 @@ function handleNextButtonClick() {
             nextButton.textContent = "Next";
             disableLoaderAnimation();
             closeVideoCall();
-            removeTimer();
-            // clearChat();
+            // removeTimer();
         } else {
             nextButton.textContent = "Stop";
             enableLoaderAnimation();
@@ -311,6 +346,8 @@ function handleNextButtonClick() {
 }
 
 function handleDisconnect() {
+    textInput.disabled = true;
+    sendMessageButton.disabled = true;
     if (autoNext.checked) {
         nextButton.textContent = "Stop";
         closeVideoCall();
@@ -358,9 +395,6 @@ function closeVideoCall() {
         }
     }
 }
-
-//Next Button
-nextButton.addEventListener('click', handleNextButtonClick);
 
 // Chat 
 function sendMessage(event) {
@@ -429,10 +463,3 @@ function enableLoaderAnimation() {
 function disableLoaderAnimation() {
     remoteVideo.classList.replace('spinner-loader', 'video');
 };
-
-const messageList = document.getElementById("chatBox");
-const textInput = document.getElementById("textInput");
-const sendMessageButton = document.getElementById("sendMessageButton");
-
-sendMessageButton.addEventListener("click", sendMessage);
-textInput.addEventListener("keydown", enterKeyMessage);
