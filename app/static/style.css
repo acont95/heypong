@@ -80,6 +80,7 @@ header {
     height: 100%;
     width: 100%;
     border-radius: 15px;
+    pointer-events: none;
 }
 
 #chatContainer {
@@ -123,7 +124,7 @@ header {
     overflow-wrap: break-word;
     max-width: 50%;
 
-    float: left; /*https://stackoverflow.com/questions/33322281/aligning-message-bubbles-right-and-left*/
+    float: right; /*https://stackoverflow.com/questions/33322281/aligning-message-bubbles-right-and-left*/
     clear: both;
 }
 
@@ -138,8 +139,55 @@ header {
     overflow-wrap: break-word;
     max-width: 50%;
 
-    float: right;
+    float: left;
     clear: both;
+}
+
+.timer {
+    width: fit-content;
+    color: white;
+    padding: 10px;
+    background-color: red;
+    border-radius: 20px;
+    margin: 2px;
+
+    overflow-wrap: break-word;
+    max-width: 50%;
+
+    float: left;
+    clear: both;
+}
+
+.userTyping {
+    width: fit-content;
+    margin: 2px;
+    max-width: 50%;
+
+    float: left;
+    clear: both;
+}
+.typingLogo {
+    width: 45px;
+}
+
+.showCamera {
+    width: fit-content;
+    color: white;
+    padding: 10px;
+    background-color: red;
+    border-radius: 20px;
+    margin: 2px;
+
+    overflow-wrap: break-word;
+    max-width: 50%;
+
+    float: left;
+    clear: both;
+}
+
+.numUsers {
+    font-size: 24px;
+    margin-right: 5px;
 }
 
 #inputBox {
