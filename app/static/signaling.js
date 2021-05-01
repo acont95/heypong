@@ -11,6 +11,8 @@ const numUsers = document.getElementById('numUsers');
 const messageList = document.getElementById("chatBox");
 const textInput = document.getElementById("textInput");
 const sendMessageButton = document.getElementById("sendMessageButton");
+let typing = false;
+let userTyping = false;
 
 let localStream = null;
 
@@ -27,6 +29,7 @@ let connectionMap = new Map();
 
 sendMessageButton.addEventListener("click", sendMessage);
 textInput.addEventListener("keydown", enterKeyMessage);
+textInput.addEventListener("keydown", sendTyping);
 nextButton.addEventListener('click', handleNextButtonClick);
 
 // Add STUN/TURN servers.
@@ -145,6 +148,49 @@ function sendDisconnect() {
     );
 };
 
+function setUserTyping() {
+    const item = document.createElement('li');
+    item.className = "userTyping";
+    item.textContent = "User is typing...";
+    messageList.appendChild(item);
+    scrollChatBottom();
+    userTyping = true;
+}
+
+function removeUserTyping() {
+    var listItems = messageList.getElementsByClassName('userTyping');
+    var last = listItems[listItems.length - 1];
+    messageList.removeChild(last);
+}
+
+function moveUserTyping() {
+    if (userTyping) {
+        removeUserTyping();
+        setUserTyping();
+    }
+}
+
+function sendTyping(event) {
+    if (event.keyCode !== 13) {
+        if (!typing) {
+            ws.send(
+                JSON.stringify(
+                    {
+                        type: "typing",
+                        target: Array.from(connectionMap.keys()),
+                        caller: clientId
+                    }
+                )
+            )
+
+            typing = true;
+            setTimeout(function() {
+                typing = false;
+            }, 2000)
+        }
+    }
+}
+
 ws.onmessage = function(event) {
     var data = JSON.parse(event.data);
 
@@ -165,9 +211,19 @@ ws.onmessage = function(event) {
     else if (data['type'] === "chat") {
         const msg = data['message'];
         appendRecievedMessage(msg);
+        moveUserTyping();
     }
     else if (data['type'] === "disconnect") {
         handleDisconnect();
+    }
+    else if (data['type'] === "typing") {
+        if (!userTyping) {
+            setUserTyping();
+            setTimeout(function() {
+                removeUserTyping();
+                userTyping = false;
+            }, 5000);
+        }
     }
 };
 
@@ -300,7 +356,7 @@ function showTimer() {
     startTimer(4, item);
 }
 
-function removeTimer() {
+function removeLastList() {
     var listItems = messageList.getElementsByTagName('li');
     var last = listItems[listItems.length - 1];
     messageList.removeChild(last);
@@ -334,7 +390,7 @@ function handleNextButtonClick() {
             nextButton.textContent = "Next";
             disableLoaderAnimation();
             closeVideoCall();
-            // removeTimer();
+            // removeLastList();
         } else {
             nextButton.textContent = "Stop";
             enableLoaderAnimation();
@@ -411,6 +467,7 @@ function sendMessage(event) {
             )
         );   
         appendSentMessage(msg);
+        moveUserTyping();
         textInput.value = "";
     } 
 };

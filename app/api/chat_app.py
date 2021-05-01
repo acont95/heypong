@@ -4,10 +4,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.requests import Request
-from starlette.websockets import WebSocketClose, WebSocketDisconnect
+from starlette.websockets import WebSocketDisconnect
 from app.models.offer_answer import OfferAnswer
 from app.models.chat_message import ChatMessage
 from app.models.disconnect import Disconnect
+from app.models.user_typing import UserTyping
 import uuid 
 from typing import Dict
 from collections import OrderedDict
@@ -34,12 +35,8 @@ def new_peer(client_id: str):
         else:
             manager.waiting[client_id] = None
             return {'peer': None}
-    # if (manager.waiting) and (client_id not in manager.waiting):
-    #     return {'peer': manager.waiting.popitem(last=False)}
-    # else:
-    #     if not client_id in manager.waiting:
-    #         manager.waiting.append(client_id)
-    #     return {'peer': None} 
+    else:
+        return {'peer': None}
 
 class ConnectionManager:
     def __init__(self):
@@ -60,6 +57,8 @@ class ConnectionManager:
 
     def disconnect(self, websocket: WebSocket, _id: str):
         del self.connections[_id]
+        if _id in self.waiting:
+            del self.waiting[_id]
         self.n_users -= 1    
 
     async def process_signal(self, message: str):
@@ -145,6 +144,22 @@ class ConnectionManager:
                         'caller': message.caller.hex
                     }
                 )
+        
+        elif (message['type'] == 'typing'):
+            message = UserTyping(
+                    type = message['type'],
+                    target = message['target'],
+                    caller = message['caller']
+            )
+            
+            for target in message.target:
+                await self.connections[target.hex].send_json(
+                    {
+                        'type' : message.type,
+                        'target' : target.hex,
+                        'caller' : message.caller.hex
+                    }
+                )
 
 
 manager = ConnectionManager()
@@ -162,3 +177,4 @@ async def websocket_endpoint(websocket: WebSocket):
         
     except WebSocketDisconnect:
         manager.disconnect(websocket = websocket, _id = _id)
+        print('disconnect')
