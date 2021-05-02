@@ -8,21 +8,45 @@
 		<link rel="icon" href="/static/favicon.svg" sizes="any" type="image/svg+xml">
 		<title>heypong - Chat with random people around the world!</title>
 		<link rel="stylesheet" href="/static/style.css">
+
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-3336WVZQMM"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+
+			gtag('config', 'G-3336WVZQMM');
+		</script> -->
 	</head>
 
 	<body id="body">
 
 		<header>
 			<img id="logo" src="/static/logo.svg">
-			<div id = numUsers class=numUsers>Number of users online: </div>
+			<div id = numUsers class=numUsers>Users Online: </div>
 		</header>
 
 		<div id="mainContainer">
 			<div id="contentContainer">
 				<div id=videoWrapper>
 					<div class = "videoContainer" id="remoteVideoContainer">
+						<div id=loader class="sk-circle">
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+							<div class="sk-circle-dot"></div>
+						  </div>
 						<video autoplay="true" class = "video" id="remoteVideo">
-				
+
 						</video>
 					</div>
 					<div class = "videoContainer" id="localVideoContainer">

@@ -6,13 +6,14 @@ const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 const nextButton = document.getElementById('nextButton');
 const autoNext = document.getElementById('autoNext');
-const loader = document.getElementById('loaderWrap');
+const loader = document.getElementById('loader');
 const numUsers = document.getElementById('numUsers');
 const messageList = document.getElementById("chatBox");
 const textInput = document.getElementById("textInput");
 const sendMessageButton = document.getElementById("sendMessageButton");
 let typing = false;
 let userTyping = false;
+let typingTimeout = null;
 
 let localStream = null;
 
@@ -68,7 +69,7 @@ function getUserMedia() {
 
 function showEnableCameraMessage() {
     const item = document.createElement('li');
-    item.className = "showCamera"
+    item.className = "showCamera";
     item.textContent = "Camera must be enable to use heypong. Please refresh page and enable your camera.";
     messageList.appendChild(item);
     scrollChatBottom();
@@ -151,24 +152,28 @@ function sendDisconnect() {
 function setUserTyping() {
     const item = document.createElement('li');
     item.className = "userTyping";
-    item.textContent = "User is typing...";
+
+    const typingLogo = document.createElement('img');
+    typingLogo.className = "typingLogo";
+    typingLogo.src = "/static/typing.svg";
+
+    item.appendChild(typingLogo);
     messageList.appendChild(item);
     scrollChatBottom();
     userTyping = true;
-}
+};
 
 function removeUserTyping() {
     var listItems = messageList.getElementsByClassName('userTyping');
     var last = listItems[listItems.length - 1];
     messageList.removeChild(last);
-}
+    userTyping = false;
+};
 
 function moveUserTyping() {
-    if (userTyping) {
-        removeUserTyping();
-        setUserTyping();
-    }
-}
+    removeUserTyping();
+    setUserTyping();
+};
 
 function sendTyping(event) {
     if (event.keyCode !== 13) {
@@ -186,7 +191,7 @@ function sendTyping(event) {
             typing = true;
             setTimeout(function() {
                 typing = false;
-            }, 2000)
+            }, 1000)
         }
     }
 }
@@ -211,7 +216,10 @@ ws.onmessage = function(event) {
     else if (data['type'] === "chat") {
         const msg = data['message'];
         appendRecievedMessage(msg);
-        moveUserTyping();
+        if (userTyping) {
+            removeUserTyping();
+            clearTimeout(typingTimeout);
+        }
     }
     else if (data['type'] === "disconnect") {
         handleDisconnect();
@@ -219,10 +227,19 @@ ws.onmessage = function(event) {
     else if (data['type'] === "typing") {
         if (!userTyping) {
             setUserTyping();
-            setTimeout(function() {
-                removeUserTyping();
-                userTyping = false;
-            }, 5000);
+            typingTimeout = setTimeout(function() {
+                if (userTyping){
+                    removeUserTyping();
+                }
+            }, 2000);
+        }
+        else {
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(function() {
+                if (userTyping){
+                    removeUserTyping();
+                }
+            }, 2000);
         }
     }
 };
@@ -247,7 +264,7 @@ async function getNumUsers() {
 
 async function setNumUsers() {
     const n = await getNumUsers();
-    numUsers.textContent = `Number of users online: ${n}`
+    numUsers.textContent = `Users Online: ${n}`
 }
 
 function newPeerConnection(peerTarget) {
@@ -353,7 +370,7 @@ function startTimer(duration, display) {
 
 function showTimer() {
     const item = appendTimer();
-    startTimer(4, item);
+    startTimer(2, item);
 }
 
 function removeLastList() {
@@ -390,7 +407,7 @@ function handleNextButtonClick() {
             nextButton.textContent = "Next";
             disableLoaderAnimation();
             closeVideoCall();
-            // removeLastList();
+            removeLastList();
         } else {
             nextButton.textContent = "Stop";
             enableLoaderAnimation();
@@ -415,7 +432,7 @@ function handleDisconnect() {
                 clearChat();
                 nextVideoChat();
             }
-        }, 5000)
+        }, 3000)
     }
     else {
         nextButton.textContent = "Next";
@@ -467,7 +484,9 @@ function sendMessage(event) {
             )
         );   
         appendSentMessage(msg);
-        moveUserTyping();
+        if (userTyping) {
+            moveUserTyping();
+        }
         textInput.value = "";
     } 
 };
@@ -503,7 +522,7 @@ function appendRecievedMessage(msg) {
 function appendTimer() {
     const item = document.createElement('li');
     item.className = "timer"
-    item.textContent = "New chat in: 05";
+    item.textContent = "New chat in: 03";
     messageList.appendChild(item);
     scrollChatBottom();
     return item;
@@ -514,9 +533,11 @@ function scrollChatBottom() {
 };
 
 function enableLoaderAnimation() {
-    remoteVideo.classList.replace('video', 'spinner-loader');
+    remoteVideo.style.display = "none";
+    loader.style.display = "block";
 };
 
 function disableLoaderAnimation() {
-    remoteVideo.classList.replace('spinner-loader', 'video');
+    remoteVideo.style.display = "block";
+    loader.style.display = "none";
 };
