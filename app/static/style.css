@@ -13,6 +13,7 @@ body {
     /* border: 2px solid orange; */
     display: flex;
     flex-direction: column;
+    background-color: white;
 }
 
 header {
@@ -61,7 +62,7 @@ header {
 }
 
 .videoContainer {
-    border: 1px solid #000000; 
+    /* border: 1px solid #000000;  */
     margin: 2px;
     height: 45vh;
     width: 60vh;
@@ -71,11 +72,12 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #DAE0E6;
 }
 
 .video {
     /* background-color: #666; */
-    background-color: whitesmoke;
+    background-color: #DAE0E6;
     object-fit: cover;
     height: 100%;
     width: 100%;
@@ -102,7 +104,7 @@ header {
 
 #chatBox {
     margin: 2px;
-    border: 1px solid black;
+    /* border: 1px solid black; */
     border-radius: 15px;
     flex: 1 1 auto;
     list-style-type: none;
@@ -111,6 +113,7 @@ header {
     /* allow list to scroll */
     height: 0; /*https://stackoverflow.com/questions/31292954/how-can-i-get-overflowscroll-inside-a-flex-box */
     overflow: auto;
+    background-color: #DAE0E6;
 }
 
 .sentMessage {
