@@ -10,15 +10,12 @@ html, body {
 body {
     height: 100vh;
     width: 100vw;
-    /* border: 2px solid orange; */
     display: flex;
     flex-direction: column;
     background-color: white;
 }
 
 header {
-    /* border: 2px solid green; */
-    /* margin: 2px; */
     flex: 1;
     display: flex;
     align-items: center;
@@ -33,17 +30,14 @@ header {
 }
 
 #mainContainer {
-    /* border: 2px solid rgb(44, 73, 204); */
     margin: 4px;
-
-    /* height: 100%; */
     min-height: 0;
     display: flex;
+
+    flex: 0 1 auto;
 }
 
 #contentContainer {
-    /* margin: 2px; */
-    /* border: 2px solid yellow; */
     max-height: 100%;
     display: flex;
     flex-direction: column;
@@ -51,8 +45,6 @@ header {
 }
 
 #videoWrapper {
-    /* border: 2px solid purple; */
-    /* margin: 2px; */
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -62,7 +54,6 @@ header {
 }
 
 .videoContainer {
-    /* border: 1px solid #000000;  */
     margin: 2px;
     height: 45vh;
     width: 60vh;
@@ -98,8 +89,6 @@ header {
 } 
 
 #chatContainer {
-    /* border: 2px solid rgb(199, 47, 47); */
-    /* margin: 2px; */
     flex: 1 1 auto;
     min-width: 0; /*https://stackoverflow.com/questions/41674979/flex-child-is-growing-out-of-parent*/
     display: flex;
@@ -116,15 +105,13 @@ header {
 
 #chatBox {
     margin: 2px;
-    /* border: 1px solid black; */
-    /* border-radius: 15px; */
     border-top-right-radius: 15px;
     flex: 1 1 auto;
     list-style-type: none;
     padding: 5px;
     
     /* allow list to scroll */
-    height: 0; /*https://stackoverflow.com/questions/31292954/how-can-i-get-overflowscroll-inside-a-flex-box */
+    height: 0; /* https://stackoverflow.com/questions/31292954/how-can-i-get-overflowscroll-inside-a-flex-box */
     overflow: auto;
     background-color: #DAE0E6;
 }
@@ -182,6 +169,7 @@ header {
     float: left;
     clear: both;
 }
+
 .typingLogo {
     width: 45px;
 }
@@ -202,7 +190,7 @@ header {
 }
 
 .numUsers {
-    font-size: 24px;
+    font-size: 1rem;
     margin-right: 5px;
 }
 
@@ -226,9 +214,9 @@ header {
 
 #sendMessageButton {
     border: none;
-    font-size: 16px;
+    font-size: 0.75rem;
     border-radius: 12px;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     margin: 5px;
     padding: 5px;
 }
@@ -240,7 +228,7 @@ header {
     padding: 25px;
     text-align: center;
     border-radius: 12px;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
 }
 
 .hvr-fade {
@@ -256,6 +244,7 @@ header {
     transition-property: color, background-color;
     background-color: lightgray;
   }
+
 .hvr-fade:hover {
     background-color: turquoise;
     color: white;
@@ -277,6 +266,8 @@ header {
     font-size: 16px;
     pointer-events: none;
     cursor: default;
+
+    font-size: 1rem;
 }
 
 input[type='checkbox']{
@@ -301,13 +292,11 @@ input[type='checkbox']:checked {
     background-color: limegreen;
 }
 
-
 /* Config */
 :root {
     --sk-size: 40px;
     --sk-color: #333;
   }
-  
   
 /* Utility class for centering */
 /*  Circle
@@ -384,3 +373,70 @@ input[type='checkbox']:checked {
   #loader {
       display: none;
   }
+
+#autoNext {
+    flex: 0 0 auto;
+}
+
+@media only screen and (max-width: 860px) {
+    #sendMessageButton {
+        display: none;
+    }
+}
+
+@media only screen and (max-aspect-ratio: 3/4) {
+    /* For mobile phones: */
+    header {
+        flex: 0;
+    }
+
+    #mainContainer {
+        margin: 4px;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+    }
+
+    #localVideoContainer {
+        height: 15vh;
+        width: 20vh;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    #remoteVideoContainer {
+        /* width: 98.5vw; */
+        height: 73.875vw;
+        width: 100%;
+        border-top-right-radius: 15px;
+    }
+
+    #videoWrapper {
+        position: relative;
+    }
+    
+    #remoteVideo {
+        border-top-right-radius: 15px;
+    }
+    
+    #localVideo {
+        border-bottom-left-radius: 0;
+    }
+    
+    #localVideoContainer {
+        border-bottom-left-radius: 0;
+        margin-left: 0;
+    } 
+
+    #chatBox {
+        border-top-right-radius: 0;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #sendMessageButton {
+        display: none;
+    }
+}
