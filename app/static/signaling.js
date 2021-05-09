@@ -45,26 +45,25 @@ const configuration = {
 function getUserMedia() {
     let stream = null;
   
-    try {
-        navigator.mediaDevices.enumerateDevices().then(
-            async function(devices) {
-                const mics = devices.filter(device => device.kind =='audioinput');
-                const mediaStreamConstraints = {
-                    audio: mics.length > 0,
-                    video: true
-                };
-                stream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints);
-                localVideo.srcObject = stream;
-                localStream = stream;
-                nextButton.disabled = false;
-            }
-        )
-
-    } catch(err) {
-        /* handle the error */
-        showEnableCameraMessage();
-        nextButton.disabled=true;
-    }
+    navigator.mediaDevices.enumerateDevices().then(
+        async function(devices) {
+            const mics = devices.filter(device => device.kind =='audioinput');
+            const mediaStreamConstraints = {
+                audio: mics.length > 0,
+                video: true
+            };
+            stream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints);
+            localVideo.srcObject = stream;
+            localStream = stream;
+            nextButton.disabled = false;
+        }
+    ).catch(
+        function(err) {
+            /* handle the error */
+            showEnableCameraMessage();
+            nextButton.disabled=true;
+        }
+    )
 };
 
 function showEnableCameraMessage() {
@@ -222,7 +221,9 @@ ws.onmessage = function(event) {
         }
     }
     else if (data['type'] === "disconnect") {
-        handleDisconnect();
+        if (connectionMap.size) {
+            handleDisconnect();
+        }
     }
     else if (data['type'] === "typing") {
         if (!userTyping) {
@@ -319,7 +320,9 @@ function newPeerConnection(peerTarget) {
             case "failed":
             case "closed":
             case "disconnected":
-                handleDisconnect();
+                if (connectionMap.size) {
+                    handleDisconnect();
+                }
                 break;
             
             case "completed":
@@ -375,8 +378,10 @@ function showTimer() {
 
 function removeLastList() {
     var listItems = messageList.getElementsByTagName('li');
-    var last = listItems[listItems.length - 1];
-    messageList.removeChild(last);
+    if (listItems.length) {
+        var last = listItems[listItems.length - 1];
+        messageList.removeChild(last);
+    }
 }
 
 function handleNextButtonClick() {
