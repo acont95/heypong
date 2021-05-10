@@ -4,7 +4,8 @@
 		<meta charset="utf-8">
 		<meta name="robots" content="index, follow" />
 		<meta name="description" content="heypong is a free website for meeting people around the world and connecting through video, audio, and text chat. Strangers are chosen at random, no login is required. Have fun and be safe!">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- https://stackoverflow.com/questions/11850534/ios-zooming-issue-on-responsive-site-from-portrait-to-landscape-break-points -->
+		<meta name="viewport" content="width=device-width">
 
 		<link rel="icon" href="/static/favicon.svg" sizes="any" type="image/svg+xml">
 		<title>heypong - Chat with random people around the world!</title>
@@ -25,14 +26,14 @@
 
 		<header>
 			<img id="logo" src="/static/logo.svg">
-			<div id = numUsers class=numUsers>Users Online: 40000</div>
+			<div id="numUsers" class="numUsers">Users Online: 0</div>
 		</header>
 
 		<div id="mainContainer">
 			<div id="contentContainer">
-				<div id=videoWrapper>
-					<div class = "videoContainer" id="remoteVideoContainer">
-						<div id=loader class="sk-circle">
+				<!-- <div id="videoWrapper"> -->
+					<div class="videoContainer" id="remoteVideoContainer">
+						<div id="loader" class="sk-circle">
 							<div class="sk-circle-dot"></div>
 							<div class="sk-circle-dot"></div>
 							<div class="sk-circle-dot"></div>
@@ -46,27 +47,27 @@
 							<div class="sk-circle-dot"></div>
 							<div class="sk-circle-dot"></div>
 						  </div>
-						<video autoplay="true" class = "video" id="remoteVideo">
+						<video autoplay="true" class="video" id="remoteVideo" playsinline="true">
 
 						</video>
 					</div>
-					<div class = "videoContainer" id="localVideoContainer">
-						<video autoplay="true" class = video id="localVideo">
+					<div class="videoContainer" id="localVideoContainer">
+						<video autoplay="true" class="video" id="localVideo" playsinline="true">
 						
 						</video>
 					</div>
-				</div>
+				<!-- </div> -->
 			</div>
 		
 			<div id="chatContainer">
-				<ul id=chatBox>
+				<ul id="chatBox">
 
 				</ul>
 
 				<div id="bottomRow">
 					<button type="button" id="sendMessageButton" class="hvr-fade">Send<br>Message</button>
 					<img id="arrow" src="/static/line-angle-right.svg">
-					<textarea id = textInput name=textInput cols="40" rows="5"></textarea>	
+					<textarea id="textInput" name="textInput" cols="40" rows="5"></textarea>	
 					
 					<button id="nextButton" class="hvr-fade">Next</button>
 					
