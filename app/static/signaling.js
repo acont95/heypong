@@ -14,6 +14,9 @@ const sendMessageButton = document.getElementById("sendMessageButton");
 let typing = false;
 let userTyping = false;
 let typingTimeout = null;
+let waiting = false;
+let countDown;
+let autoNextTimeout = null;
 
 let localStream = null;
 
@@ -38,6 +41,18 @@ const configuration = {
     iceServers: [
         {
             urls: ["stun:stun.l.google.com:19302"]
+        },
+        {
+            urls: ["stun:stun1.l.google.com:19302"]
+        },
+        {
+            urls: ["stun:stun2.l.google.com:19302"]
+        },
+        {
+            urls: ["stun:stun3.l.google.com:19302"]
+        },
+        {
+            urls: ["stun:stun4.l.google.com:19302"]
         }
     ]
 };
@@ -356,7 +371,7 @@ async function nextVideoChat() {
 
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds;
-    var countDown = setInterval(function () {
+    countDown = setInterval(function () {
         minutes = parseInt(timer / 60, 10);
         seconds = parseInt(timer % 60, 10);
 
@@ -369,12 +384,12 @@ function startTimer(duration, display) {
             clearInterval(countDown);
         }
     }, 1000);
-}
+};
 
 function showTimer() {
     const item = appendTimer();
     startTimer(2, item);
-}
+};
 
 function removeLastList() {
     var listItems = messageList.getElementsByTagName('li');
@@ -382,72 +397,74 @@ function removeLastList() {
         var last = listItems[listItems.length - 1];
         messageList.removeChild(last);
     }
-}
+};
 
 function handleNextButtonClick() {
     sendMessageButton.disabled = true;
     textInput.disabled = true;
-    if (connectionMap.size && !autoNext.checked) {
+    if (autoNextTimeout !== null) {
+        removeLastList();
+        clearInterval(countDown);
+        clearTimeout(autoNextTimeout);
+        autoNextTimeout = null;
+        waiting = false;
         nextButton.textContent = "Next";
-
+        disableLoaderAnimation();
+        sendDisconnect();
+        closeVideoCall();
+    }
+    else if (connectionMap.size && !autoNext.checked) {
+        waiting = false;
+        nextButton.textContent = "Next";
         sendDisconnect();
         closeVideoCall();
     }
     else if (connectionMap.size && autoNext.checked) {
+        waiting = false;
         nextButton.textContent = "Stop";
-
         sendDisconnect();
         closeVideoCall();
         showTimer();
-        setTimeout(function() {
-            if (nextButton.textContent === "Stop") {
-                enableLoaderAnimation();
-                clearChat();
-                nextVideoChat();
-            }
-        }, 5000)
+        autoNextTimeout = setTimeout(function() {
+            autoNextTimeout = null;
+            nextButton.click();
+        }, 3000);
     }
     else if (!connectionMap.size) {
-        if (nextButton.textContent === "Stop") {
-            nextButton.textContent = "Next";
-            disableLoaderAnimation();
-            closeVideoCall();
-            removeLastList();
-        } else {
+        if (!waiting) {
+            waiting = true;
             nextButton.textContent = "Stop";
             enableLoaderAnimation();
             closeVideoCall();
             clearChat();
             nextVideoChat();
-        }
+        } 
+        else if (waiting) {
+            waiting = false;
+            nextButton.textContent = "Next";
+            disableLoaderAnimation();
+            sendDisconnect();
+            closeVideoCall();
+        } 
     }
 }
 
 function handleDisconnect() {
+    waiting = false;
     textInput.disabled = true;
     sendMessageButton.disabled = true;
     if (autoNext.checked) {
-        nextButton.textContent = "Stop";
-        closeVideoCall();
-        showTimer();
-
-        setTimeout(function() {
-            if (nextButton.textContent === "Stop") {
-                enableLoaderAnimation();
-                clearChat();
-                nextVideoChat();
-            }
-        }, 3000)
+        nextButton.click();
     }
     else {
         nextButton.textContent = "Next";
         closeVideoCall();
     }
-}
+};
 
 function clearChat() {
     messageList.innerHTML = "";
-}
+};
 
 function closeVideoCall() {
     if (connectionMap.size) {
@@ -472,7 +489,7 @@ function closeVideoCall() {
             remoteVideo.srcObject = null;
         }
     }
-}
+};
 
 // Chat 
 function sendMessage(event) {
@@ -512,7 +529,7 @@ function appendSentMessage(msg) {
         messageList.appendChild(item);
         scrollChatBottom();
     }
-}
+};
 
 function appendRecievedMessage(msg) {
     if (msg) {
@@ -522,7 +539,7 @@ function appendRecievedMessage(msg) {
         messageList.appendChild(item);
         scrollChatBottom();
     }
-}
+};
 
 function appendTimer() {
     const item = document.createElement('li');
@@ -531,7 +548,7 @@ function appendTimer() {
     messageList.appendChild(item);
     scrollChatBottom();
     return item;
-}
+};
 
 function scrollChatBottom() {
     messageList.scrollTop = messageList.scrollHeight; /*https://stackoverflow.com/questions/270612/scroll-to-bottom-of-div */

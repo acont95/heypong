@@ -1,17 +1,19 @@
-from app.models.ice_candidate import IceCandidate
+import uuid 
+from typing import Dict
+from collections import OrderedDict
+
 from fastapi import FastAPI, WebSocket
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.requests import Request
 from starlette.websockets import WebSocketDisconnect
+
 from app.models.offer_answer import OfferAnswer
 from app.models.chat_message import ChatMessage
 from app.models.disconnect import Disconnect
 from app.models.user_typing import UserTyping
-import uuid 
-from typing import Dict
-from collections import OrderedDict
+from app.models.ice_candidate import IceCandidate
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -24,7 +26,7 @@ def home_page(request: Request):
 
 @app.get('/num_users')
 def num_users():
-    return {'num_users': manager.n_users}
+    return {'num_users': len(manager.connections)}
 
 @app.get('/new_peer')
 def new_peer(client_id: str):
@@ -38,9 +40,12 @@ def new_peer(client_id: str):
     else:
         return {'peer': None}
 
+@app.get('/privacy', response_class=HTMLResponse)
+def privacy_policy(request: Request):
+    return templates.TemplateResponse('privacy.html', context = {'request':request})
+
 class ConnectionManager:
     def __init__(self):
-        self.n_users = 0
         self.connections: Dict[str, WebSocket] = {}
         self.waiting: OrderedDict[str, None] = OrderedDict()
 
@@ -53,15 +58,13 @@ class ConnectionManager:
                 'id' : _id
             }
         )
-        self.n_users += 1
 
     def disconnect(self, websocket: WebSocket, _id: str):
         del self.connections[_id]
         if _id in self.waiting:
             del self.waiting[_id]
-        self.n_users -= 1    
 
-    async def process_signal(self, message: str):
+    async def process_signal(self, message: str, _id: str):
         if message['type'] == 'new-ice-candidate':
             connection = self.connections[message['target']]
             ice_candidate = IceCandidate(
@@ -137,13 +140,17 @@ class ConnectionManager:
             )
 
             for target in message.target:
-                await self.connections[target.hex].send_json(
-                    {
-                        'type' : message.type,
-                        'target' : target.hex,
-                        'caller': message.caller.hex
-                    }
-                )
+                if target.hex in self.connections:
+                    await self.connections[target.hex].send_json(
+                        {
+                            'type' : message.type,
+                            'target' : target.hex,
+                            'caller': message.caller.hex
+                        }
+                    )
+
+            if _id in self.waiting:
+                del self.waiting[_id]
         
         elif (message['type'] == 'typing'):
             message = UserTyping(
@@ -171,10 +178,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             message = await websocket.receive_json()
-            print(_id)
-            print(message['type'], message['caller'])
-            await manager.process_signal(message)
+            await manager.process_signal(message, _id = _id)
         
     except WebSocketDisconnect:
         manager.disconnect(websocket = websocket, _id = _id)
-        print('disconnect')
